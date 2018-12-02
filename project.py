@@ -5,10 +5,16 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Restaurant, MenuItem
 
+# New imports from Flask for the Google+ Auth
+from flask import session as login_session
+import random, string
 
-#Connect to Database and create database session
 
-
+@app.route('/login')
+def showLogin():
+  state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+  login_session['state'] = state
+  return "The current session state is %s" %login_session['state']
 
 #JSON APIs to view Restaurant Information
 @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
@@ -186,7 +192,7 @@ def deleteMenuItem(restaurant_id,menu_id):
 
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    
+
     restaurant = session.query(Restaurant).filter_by(id = restaurant_id).one()
     itemToDelete = session.query(MenuItem).filter_by(id = menu_id).one() 
     if request.method == 'POST':
